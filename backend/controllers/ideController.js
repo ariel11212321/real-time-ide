@@ -1,9 +1,9 @@
 const ideService = require('../services/ideService');
 
 exports.joinRoom = async (req, res) => {
-  const { roomId, userId, username } = req.body;
+  const { roomId } = req.body;
   try {
-    const room = await ideService.joinRoom(roomId, userId, username);
+    const room = await ideService.joinRoom(roomId);
     res.json({ success: true, roomId: room.roomId });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -41,6 +41,15 @@ exports.uploadFile = async (req, res) => {
   try {
     const result = await ideService.handleFileUpload(roomId, file);
     res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+exports.createRoom = async (req, res) => {
+  try {
+    const room = await ideService.createRoom();
+    res.json({ success: true, roomId: room.roomId });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

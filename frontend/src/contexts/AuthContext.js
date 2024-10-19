@@ -16,7 +16,6 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setIsAuthenticated(true);
-      // You might want to fetch user data here
     }
   }, []);
 

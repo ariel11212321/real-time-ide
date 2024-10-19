@@ -7,10 +7,12 @@ import Room from './components/Room';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 
+/*
 const PrivateRoute = () => {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
+*/
 
 const App = () => {
   return (
@@ -20,11 +22,11 @@ const App = () => {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route element={<PrivateRoute />}>
+      
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
             <Route path="/room/:roomId" element={<Room />} />
-          </Route>
+     
         </Routes>
       </Router>
     </AuthProvider>

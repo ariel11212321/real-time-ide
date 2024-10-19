@@ -1,22 +1,15 @@
 const Room = require('../models/Room');
 const User = require('../models/User');
 const { exec } = require('child_process');
+const { v4: uuidv4 } = require('uuid');
 const fs = require('fs').promises;
 const path = require('path');
 
-exports.joinRoom = async (roomId, userId, username) => {
+exports.joinRoom = async (roomId) => {
   let room = await Room.findOne({ roomId });
   if (!room) {
-    room = new Room({ roomId });
-    await room.save();
+    throw new Error('Room not found');
   }
-
-  let user = await User.findOne({ userId });
-  if (!user) {
-    user = new User({ userId, username });
-    await user.save();
-  }
-
   return room;
 };
 
@@ -26,8 +19,15 @@ exports.getRoomCode = async (roomId) => {
 };
 
 exports.updateRoomCode = async (roomId, newCode) => {
-  await Room.findOneAndUpdate({ roomId }, { code: newCode, updatedAt: Date.now() });
+  const updatedRoom = await Room.findOneAndUpdate(
+    { roomId }, 
+    { code: newCode, updatedAt: Date.now() },
+    { new: true }
+  );
+  console.log(`Code updated in room ${roomId}:`, newCode);
+  return updatedRoom;
 };
+
 
 exports.runCode = async (roomId, code) => {
   const room = await Room.findOne({ roomId });
@@ -40,7 +40,7 @@ exports.runCode = async (roomId, code) => {
 
   return new Promise((resolve, reject) => {
     exec(`node ${filePath}`, (error, stdout, stderr) => {
-      fs.unlink(filePath).catch(console.error);  // Clean up temp file
+      fs.unlink(filePath).catch(console.error); 
       if (error) {
         reject(error);
       } else {
@@ -58,4 +58,12 @@ exports.handleFileUpload = async (roomId, file) => {
   await this.updateRoomCode(roomId, fileContent);
 
   return { success: true, message: 'File uploaded and code updated.' };
+};
+
+
+exports.createRoom = async () => {
+  const roomId = uuidv4();
+  const room = new Room({ roomId, code: '// Start coding here' });
+  await room.save();
+  return room;
 };
